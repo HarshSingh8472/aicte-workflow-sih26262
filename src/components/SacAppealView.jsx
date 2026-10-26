@@ -1,0 +1,266 @@
+import React, { useState } from 'react';
+import { 
+  Scale, 
+  Gavel, 
+  FileText, 
+  Calendar, 
+  User, 
+  CheckCircle2, 
+  XCircle, 
+  AlertTriangle, 
+  ShieldCheck, 
+  ArrowRight,
+  Stamp,
+  Building,
+  UploadCloud
+} from 'lucide-react';
+import WorkflowPipeline from './WorkflowPipeline';
+
+export default function SacAppealView({
+  institutions = [],
+  onGrantAppeal,
+  onDismissAppeal,
+  onViewAudit
+}) {
+  // Filter for institutions in SAC Appeal stage or Path-4
+  const appealColleges = institutions.filter(
+    i => i.currentStage === 'sac_appeal' || i.assignedPath === 'path-4'
+  );
+
+  const [selectedId, setSelectedId] = useState(
+    appealColleges.find(c => c.currentStage === 'sac_appeal')?.id || appealColleges[0]?.id || institutions[0]?.id
+  );
+
+  const selectedInst = institutions.find(i => i.id === selectedId) || institutions[0];
+
+  const [benchVerdict, setBenchVerdict] = useState('');
+  const [benchMembers] = useState([
+    "Hon'ble Justice (Retd.) P. N. Verma (Former Judge, High Court)",
+    "Prof. (Dr.) S. C. Sahasrabudhe (Former Director, IIT / AICTE Senior Fellow)",
+    "Regional Officer (Ex-Officio Member Secretary)"
+  ]);
+
+  const appealData = selectedInst?.appealDetails || {
+    filedDate: '2026-10-18',
+    appellant: `${selectedInst?.name || 'Institution'} Management Trust`,
+    grounds: 'Physical deficiencies rectified post-EVC. Additional faculty appointed with Aadhaar validation.',
+    hearingScheduledDate: '2026-10-30',
+    appellateBench: "Hon'ble Standing Appellate Committee",
+    status: 'Hearing Scheduled'
+  };
+
+  const deficiencyReasons = selectedInst?.evcInspection?.deficiencyReasons || [
+    "Instructional carpet area in 2 classrooms below 66 sq.m minimum APH norm.",
+    "Faculty to student ratio at 1:19.0 exceeding 1:15 limit.",
+    "Upper floor construction incomplete during initial inspection visit."
+  ];
+
+  return (
+    <div className="space-y-5">
+      {/* Module Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-amber-950 to-slate-900 text-white p-5 rounded-2xl border border-slate-800 shadow-gov">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Stage 3 Appellate Authority
+              </span>
+              <span className="text-slate-400 text-xs font-mono">
+                Quasi-Judicial Standing Appellate Committee (SAC/SHC)
+              </span>
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <Scale className="w-5 h-5 text-amber-400" />
+              SAC / SHC Standing Appellate Committee Workbench
+            </h2>
+            <p className="text-xs text-slate-300 max-w-3xl mt-1 leading-relaxed">
+              Quasi-Judicial appellate forum constituted under Chapter II of AICTE Approval Process Handbook to hear institutional grievances against Scrutiny/EVC deficiency rejections.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-700">
+            <span className="text-xs text-slate-400">Select Appeal:</span>
+            <select
+              value={selectedInst?.id}
+              onChange={(e) => setSelectedId(e.target.value)}
+              className="bg-slate-800 text-white text-xs font-medium rounded-lg px-2.5 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 max-w-xs"
+            >
+              {institutions.map(inst => (
+                <option key={inst.id} value={inst.id}>
+                  {inst.name} ({inst.status})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Selected Banner */}
+        {selectedInst && (
+          <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div>
+              <span className="text-slate-400 block text-[11px]">Appellant Institution</span>
+              <span className="font-bold text-white truncate block">{selectedInst.name}</span>
+              <span className="font-mono text-amber-300 text-[11px]">{selectedInst.permanentId}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Appeal Filing Date</span>
+              <span className="font-medium text-slate-200">{appealData.filedDate}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Bench Hearing Status</span>
+              <span className="font-semibold text-amber-300">{appealData.status}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Appellate SLA Timer</span>
+              <span className="font-mono text-emerald-400 font-semibold">
+                {selectedInst.slaDaysRemaining !== undefined ? `${selectedInst.slaDaysRemaining} Days Left` : 'Active'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Progress Pipeline */}
+      {selectedInst && <WorkflowPipeline institution={selectedInst} />}
+
+      {/* Grid: Grounds for Appeal vs Appellate Bench Judgment */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        {/* Left Column (6 cols): Appeal Dossier & Rectified Evidence */}
+        <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-amber-600" />
+              Appeal Memorandum & EVC Deficiency Dossier
+            </h3>
+            <p className="text-xs text-slate-500">Formal grievance petition submitted by College Management</p>
+          </div>
+
+          {/* Original Deficiencies Flagged */}
+          <div className="p-4 bg-rose-50/70 rounded-xl border border-rose-200 space-y-2">
+            <span className="text-xs font-bold text-rose-950 flex items-center gap-1.5">
+              <XCircle className="w-4 h-4 text-rose-600" />
+              Deficiencies Recorded by Inspection Team:
+            </span>
+            <ul className="space-y-1.5 text-xs text-rose-900 list-disc list-inside">
+              {deficiencyReasons.map((reason, idx) => (
+                <li key={idx} className="leading-relaxed">{reason}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Appellant Submission & Grounds */}
+          <div className="p-4 bg-amber-50/60 rounded-xl border border-amber-200 space-y-2 text-xs">
+            <span className="font-bold text-amber-950 flex items-center gap-1.5">
+              <Gavel className="w-4 h-4 text-amber-700" />
+              Grounds of Appeal Raised by Appellant:
+            </span>
+            <p className="text-slate-700 leading-relaxed italic bg-white p-3 rounded-lg border border-amber-200/60">
+              "{appealData.grounds}"
+            </p>
+          </div>
+
+          {/* Rectified Proof Documents */}
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-slate-800 block">Rectified Compliance Proofs Uploaded:</span>
+            <div className="space-y-2 text-xs">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="font-semibold text-slate-800 block">Civil Contractor Completion Certificate</span>
+                  <span className="text-[11px] text-slate-500">3rd floor electrification & plastering completed with geo-photos</span>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+                  VERIFIED
+                </span>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="font-semibold text-slate-800 block">8 New Assistant Professor Appointment Deeds</span>
+                  <span className="text-[11px] text-slate-500">Ph.D / M.Tech qualification verified; joins effective Oct 2026</span>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+                  VERIFIED
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (6 cols): Quasi-Judicial Appellate Bench Proceedings */}
+        <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Gavel className="w-4 h-4 text-amber-600" />
+                Appellate Hearing Bench & Quasi-Judicial Order
+              </h3>
+              <p className="text-xs text-slate-500">Bench members review rectified evidence in open hearing</p>
+            </div>
+
+            {/* Bench Members */}
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
+              <span className="font-bold text-slate-800 block text-[11px] uppercase tracking-wide">
+                Constituted Appellate Bench:
+              </span>
+              {benchMembers.map((member, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-slate-700">
+                  <User className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>{member}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Hearing Notes Input */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-700">
+                Hon'ble Appellate Bench Formal Order & Ratio Decidendi:
+              </label>
+              <textarea
+                value={benchVerdict}
+                onChange={(e) => setBenchVerdict(e.target.value)}
+                placeholder="Enter formal bench judgment (e.g. Having examined the documentary evidence and certified contractor completion certificate, the Bench finds the deficiency remediated. Appeal is Allowed with direction for Regional Officer to issue EoA)..."
+                rows={4}
+                className="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Bench Actions */}
+          <div className="pt-4 border-t border-slate-200 space-y-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={() => onGrantAppeal(selectedInst, benchVerdict)}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all"
+                title="Grant appeal, overturn deficiency rejection, and route to Regional Officer for final EoA"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Grant Appeal &rarr; Route to Regional Officer for EoA</span>
+              </button>
+
+              <button
+                onClick={() => onDismissAppeal(selectedInst, benchVerdict)}
+                className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20 transition-all"
+                title="Dismiss appeal and confirm rejection of approval for academic year 2026-27"
+              >
+                <XCircle className="w-4 h-4" />
+                <span>Dismiss Appeal</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+              <span>Bench decision generates legally binding digital order</span>
+              <button 
+                onClick={() => onViewAudit(selectedInst)} 
+                className="text-amber-700 hover:underline font-medium"
+              >
+                View Appellate Audit Trail
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
