@@ -120,20 +120,20 @@ export default function TopCommandHeader({
       <div className="px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
         {/* Left: AICTE Logo & Title */}
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center shadow-lg border border-blue-400/30">
-            <span className="font-extrabold text-amber-400 tracking-wider text-sm">AICTE</span>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 flex items-center justify-center shadow-lg border border-blue-400/30 ring-1 ring-white/10 shrink-0">
+            <span className="font-extrabold text-amber-400 tracking-wider text-xs">AICTE</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                AICTE Approval Workflow Automation
+              <h1 className="text-base sm:text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5 font-sans">
+                AICTE Samanvay
               </h1>
-              <span className="px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                 APH 2026-27
               </span>
             </div>
-            <p className="text-xs text-slate-400">
-              Compliance Sentinel, SLA Sentinel & Multi-Stage Quasi-Judicial Approval System
+            <p className="text-[11px] text-slate-400 font-medium tracking-wide">
+              Integrated Approval & Compliance Sentinel Portal
             </p>
           </div>
         </div>

@@ -519,7 +519,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div>
             <p className="font-semibold text-slate-700">
-              All India Council for Technical Education (AICTE) • Smart India Hackathon SIH26262
+              AICTE Samanvay • All India Council for Technical Education (SIH26262)
             </p>
             <p className="text-[11px] text-slate-400 mt-0.5">
               Integrated Approval Workflow Automation, Compliance Sentinel and Multi-Stage Quasi-Judicial Governance Architecture
