@@ -401,6 +401,8 @@ export default function App() {
         {activeRole === 'evc' && (
           <EvcWorkbench
             institutions={data.institutions}
+            rules={data.aphRulesConfig}
+            currentDate={data.systemState.currentDate}
             onClearEvc={handleClearEvc}
             onOpenUndertakingModal={handleOpenUndertakingModal}
             onRejectEvc={handleRejectEvc}
@@ -430,6 +432,8 @@ export default function App() {
             institutions={data.institutions}
             alerts={data.alerts}
             undertakings={data.undertakings}
+            aphRules={data.aphRulesConfig}
+            currentDate={data.systemState.currentDate}
             onIssueEoa={handleIssueEoa}
             onViewAudit={(inst) => {
               setAuditInst(inst);

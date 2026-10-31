@@ -16,13 +16,20 @@ import {
   ChevronRight,
   TrendingUp,
   FileSpreadsheet,
-  AlertOctagon
+  AlertOctagon,
+  Sparkles,
+  Layers
 } from 'lucide-react';
+import PendencyMatrix from './PendencyMatrix';
+import NirnayScoreCard from './NirnayScoreCard';
+import { calculateNirnayIndex } from '../services/ruleEngine';
 
 export default function RegionalCommand({
   institutions = [],
   alerts = [],
   undertakings = [],
+  aphRules,
+  currentDate,
   onIssueEoa,
   onViewAudit,
   onOpenVault,
@@ -30,21 +37,48 @@ export default function RegionalCommand({
   onSelectInstitution
 }) {
   const [selectedRegion, setSelectedRegion] = useState('ALL');
+  const [selectedStage, setSelectedStage] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+
+  const normalizeStage = (st) => {
+    if (st === 'conditional_undertaking') return 'evc_queue';
+    if (st === 'escalated_deficiency') return 'scrutiny_queue';
+    if (st === 'eoa_issued') return 'ro_approval';
+    return st;
+  };
 
   // Filtered institutions
   const filteredColleges = institutions.filter(inst => {
     const matchesRegion = selectedRegion === 'ALL' || inst.region === selectedRegion;
-    const matchesStatus = statusFilter === 'ALL' || 
-      (statusFilter === 'COMPLIANT' && (inst.status.includes('Compliant') || inst.eoaIssued)) ||
-      (statusFilter === 'OVERDUE' && inst.slaDaysRemaining < 0) ||
-      (statusFilter === 'RO_READY' && inst.currentStage === 'ro_approval');
+    const matchesStage = selectedStage === 'ALL' || normalizeStage(inst.currentStage) === selectedStage;
+    
+    let matchesStatus = true;
+    if (statusFilter === 'COMPLIANT') {
+      matchesStatus = inst.status.includes('Compliant') || inst.eoaIssued;
+    } else if (statusFilter === 'OVERDUE') {
+      matchesStatus = inst.slaDaysRemaining < 0;
+    } else if (statusFilter === 'RO_READY') {
+      matchesStatus = inst.currentStage === 'ro_approval';
+    } else if (statusFilter === 'FAST_TRACK') {
+      const idx = calculateNirnayIndex(inst, aphRules, currentDate);
+      matchesStatus = idx.score >= 90;
+    } else if (statusFilter === 'CRITICAL_RED') {
+      const idx = calculateNirnayIndex(inst, aphRules, currentDate);
+      matchesStatus = idx.score < 60;
+    }
+
     const matchesSearch = inst.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inst.permanentId.includes(searchQuery) ||
       inst.city.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesRegion && matchesStatus && matchesSearch;
+
+    return matchesRegion && matchesStage && matchesStatus && matchesSearch;
   });
+
+  const handleCellSelect = (reg, st) => {
+    setSelectedRegion(reg);
+    setSelectedStage(st);
+  };
 
   // KPI Calculations
   const totalCount = institutions.length;
@@ -128,6 +162,14 @@ export default function RegionalCommand({
         </div>
       </div>
 
+      {/* Regional Pendency Radar & Stage Velocity Matrix */}
+      <PendencyMatrix 
+        institutions={institutions}
+        selectedRegion={selectedRegion}
+        selectedStage={selectedStage}
+        onCellSelect={handleCellSelect}
+      />
+
       {/* Filter & Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center gap-2 flex-1">
@@ -156,7 +198,16 @@ export default function RegionalCommand({
             <option value="RO_READY">Awaiting Final RO Sign-off</option>
             <option value="COMPLIANT">Compliant / EoA Issued</option>
             <option value="OVERDUE">SLA Overdue / Deficient</option>
+            <option value="FAST_TRACK">NIRNAY FastTrack (Score &ge; 90)</option>
+            <option value="CRITICAL_RED">NIRNAY High Risk (Score &lt; 60)</option>
           </select>
+
+          {selectedStage !== 'ALL' && (
+            <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-semibold flex items-center gap-1 text-[11px]">
+              Stage: {selectedStage.replace('_', ' ')}
+              <button onClick={() => setSelectedStage('ALL')} className="ml-1 text-slate-400 hover:text-slate-700 font-bold">&times;</button>
+            </span>
+          )}
         </div>
 
         {/* Search Input */}
@@ -180,6 +231,7 @@ export default function RegionalCommand({
               <tr>
                 <th className="px-4 py-3">Institution & Region</th>
                 <th className="px-4 py-3">Permanent ID</th>
+                <th className="px-4 py-3">NIRNAY Regulatory Index</th>
                 <th className="px-4 py-3">Category & Path</th>
                 <th className="px-4 py-3">Current Stage</th>
                 <th className="px-4 py-3">Compliance Status</th>
@@ -207,6 +259,11 @@ export default function RegionalCommand({
                     {/* ID */}
                     <td className="px-4 py-3.5 font-mono font-semibold text-slate-700">
                       {inst.permanentId}
+                    </td>
+
+                    {/* NIRNAY Regulatory Index */}
+                    <td className="px-4 py-3.5">
+                      <NirnayScoreCard institution={inst} rules={aphRules} currentDate={currentDate} compact={true} />
                     </td>
 
                     {/* Category & Path */}

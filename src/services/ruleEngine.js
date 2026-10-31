@@ -171,3 +171,88 @@ export function runComprehensiveAudit(institution, rules, currentDateStr) {
     docs
   };
 }
+
+/**
+ * AICTE Institutional NIRNAY Index
+ * (National Institutional Regulatory Norms & Auditing Yield)
+ * A 100-point composite regulatory health index
+ * 
+ * 1. Structural & Instructional Space (30 pts): Classroom >= 66 sq.m, Labs >= 66 sq.m, Land >= 2.5 ac
+ * 2. Academic Human Capital (30 pts): Faculty ratio <= 1:15, cadre proportion, PhD principal
+ * 3. Statutory & Financial Security (25 pts): Fire NOC valid, Stability cert valid, FDR active
+ * 4. Procedural Governance & SLA (15 pts): No active deficiencies, no SLA breaches, clean undertakings
+ */
+export function calculateNirnayIndex(institution, rules, currentDateStr) {
+  if (!institution) return { score: 75, bandGrade: 'B+', bandTone: 'blue', band: 'Band 2', entitlement: 'Standard' };
+
+  const classrooms = evaluateClassrooms(institution, rules);
+  const faculty = evaluateFacultyRatio(institution, rules);
+  const land = evaluateLand(institution, rules);
+  const docs = evaluateDocuments(institution, currentDateStr, rules?.advanceExpiryAlertDays);
+
+  let spaceScore = 0;
+  if (classrooms.pass) spaceScore += 18;
+  else spaceScore += Math.max(0, 18 - ((classrooms.failedClassrooms?.length || 0) + (classrooms.failedLabs?.length || 0)) * 6);
+  if (land.pass) spaceScore += 12;
+  else spaceScore += Math.max(0, 12 - (land.deficit || 1) * 8);
+
+  let humanCapitalScore = 0;
+  if (faculty.pass) humanCapitalScore += 20;
+  else humanCapitalScore += Math.max(0, 20 - (faculty.calculatedRatio - faculty.maxAllowedRatio) * 4);
+  if (institution.principalQualified) humanCapitalScore += 5;
+  if ((institution.cadreRatio || '').includes('1:2')) humanCapitalScore += 5;
+
+  let statutoryScore = 0;
+  const expiredDocsCount = docs.expiredCount || 0;
+  const approachingCount = docs.approachingCount || 0;
+  if (expiredDocsCount === 0) statutoryScore += 20;
+  else statutoryScore += Math.max(0, 20 - expiredDocsCount * 12);
+  if (approachingCount === 0) statutoryScore += 5;
+  else statutoryScore += Math.max(0, 5 - approachingCount * 2.5);
+
+  let governanceScore = 0;
+  const slaDays = institution.slaDaysRemaining ?? 5;
+  if (slaDays >= 0) governanceScore += 10;
+  else governanceScore += Math.max(0, 10 - Math.abs(slaDays) * 2);
+
+  if (institution.currentStage !== 'escalated_deficiency' && institution.currentStage !== 'sac_appeal') governanceScore += 5;
+  else governanceScore += 1;
+
+  const totalScore = Math.min(100, Math.max(12, Math.round(spaceScore + humanCapitalScore + statutoryScore + governanceScore)));
+
+  let band = 'Band 1 (FastTrack Green-Channel)';
+  let bandGrade = 'A+';
+  let bandTone = 'emerald';
+  let entitlement = 'Eligible for 72h Fast-Track Paperless Renewal & 2-Year Multi-Session EoA';
+
+  if (totalScore < 60) {
+    band = 'Band 4 (Statutory Surveillance / Red Notice)';
+    bandGrade = 'D';
+    bandTone = 'rose';
+    entitlement = 'Critical Non-Compliance: Admissions Halted pending Comprehensive Hearing';
+  } else if (totalScore < 75) {
+    band = 'Band 3 (Conditional Supervision)';
+    bandGrade = 'C';
+    bandTone = 'amber';
+    entitlement = 'Mandatory Physical EVC Spot-Check & Biometric Inspection';
+  } else if (totalScore < 90) {
+    band = 'Band 2 (Standard Regulatory Cadence)';
+    bandGrade = 'B+';
+    bandTone = 'blue';
+    entitlement = 'Standard Dual-Stage Scrutiny & Scheduled EVC Verification';
+  }
+
+  return {
+    score: totalScore,
+    band,
+    bandGrade,
+    bandTone,
+    entitlement,
+    breakdown: {
+      spaceScore: Math.round(spaceScore),
+      humanCapitalScore: Math.round(humanCapitalScore),
+      statutoryScore: Math.round(statutoryScore),
+      governanceScore: Math.round(governanceScore)
+    }
+  };
+}

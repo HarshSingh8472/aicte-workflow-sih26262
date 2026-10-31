@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import WorkflowPipeline from './WorkflowPipeline';
+import NirnayScoreCard from './NirnayScoreCard';
 import { evaluateClassrooms, evaluateFacultyRatio, evaluateLand } from '../services/ruleEngine';
 
 export default function CollegePortalView({
@@ -186,6 +187,15 @@ export default function CollegePortalView({
           </div>
         )}
       </div>
+
+      {/* NIRNAY Institutional Regulatory Yield Scorecard */}
+      {selectedInst && (
+        <NirnayScoreCard 
+          institution={selectedInst} 
+          rules={aphRules} 
+          currentDate={currentDate} 
+        />
+      )}
 
       {/* Real-Time Application Progress Pipeline */}
       {selectedInst && (

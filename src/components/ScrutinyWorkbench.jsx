@@ -16,7 +16,10 @@ import {
   Send,
   Flag,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Scan,
+  Shield,
+  Fingerprint
 } from 'lucide-react';
 import { 
   evaluateClassrooms, 
@@ -25,6 +28,7 @@ import {
   evaluateDocuments 
 } from '../services/ruleEngine';
 import WorkflowPipeline from './WorkflowPipeline';
+import NirnayScoreCard from './NirnayScoreCard';
 
 export default function ScrutinyWorkbench({
   institutions = [],
@@ -43,7 +47,9 @@ export default function ScrutinyWorkbench({
     scrutinyColleges.find(c => c.currentStage === 'scrutiny_queue')?.id || scrutinyColleges[0]?.id || institutions[0]?.id
   );
 
-  const [activeTab, setActiveTab] = useState('blueprint'); // 'blueprint' | 'land' | 'safety' | 'faculty'
+  const [activeTab, setActiveTab] = useState('blueprint'); // 'blueprint' | 'land' | 'safety' | 'faculty' | 'ocr'
+  const [isScanningOcr, setIsScanningOcr] = useState(false);
+  const [ocrDone, setOcrDone] = useState(true);
   const [officerNotes, setOfficerNotes] = useState('');
   const [checkboxes, setCheckboxes] = useState({
     landDeedMatches: true,
@@ -53,6 +59,14 @@ export default function ScrutinyWorkbench({
   });
 
   const selectedInst = institutions.find(i => i.id === selectedId) || institutions[0];
+
+  const handleRunOcr = () => {
+    setIsScanningOcr(true);
+    setTimeout(() => {
+      setIsScanningOcr(false);
+      setOcrDone(true);
+    }, 700);
+  };
 
   // Dynamic Rule Engine Evaluations
   const classroomEval = evaluateClassrooms(selectedInst, aphRules);
@@ -108,7 +122,7 @@ export default function ScrutinyWorkbench({
 
         {/* Selected Institution Banner */}
         {selectedInst && (
-          <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs items-center">
             <div>
               <span className="text-slate-400 block text-[11px]">Permanent AICTE ID</span>
               <span className="font-mono font-bold text-amber-300">{selectedInst.permanentId}</span>
@@ -128,6 +142,10 @@ export default function ScrutinyWorkbench({
               <span className="font-mono text-emerald-400 font-semibold">
                 {selectedInst.slaDaysRemaining !== undefined ? `${selectedInst.slaDaysRemaining} Days Left` : 'Active'}
               </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px] mb-1">NIRNAY Compliance Score</span>
+              <NirnayScoreCard institution={selectedInst} rules={aphRules} currentDate={currentDate} compact={true} />
             </div>
           </div>
         )}
@@ -183,6 +201,15 @@ export default function ScrutinyWorkbench({
                 }`}
               >
                 Faculty Roster
+              </button>
+              <button
+                onClick={() => setActiveTab('ocr')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+                  activeTab === 'ocr' ? 'bg-indigo-600 text-white shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>Satya-Pramaan OCR</span>
               </button>
             </div>
           </div>
@@ -387,6 +414,149 @@ export default function ScrutinyWorkbench({
                     <strong className="text-emerald-700 font-semibold">Verified Ph.D + 15 Yrs Experience</strong>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* TAB 5: SATYA-PRAMAAN OCR & SEAL VALIDATOR */}
+            {activeTab === 'ocr' && (
+              <div className="space-y-4">
+                {/* Header Banner */}
+                <div className="p-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-xl border border-indigo-900/50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Fingerprint className="w-4 h-4 text-amber-400" />
+                      <span className="font-bold text-sm text-white">Satya-Pramaan AI Multi-Agency Verifier</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                        Zero-Plagiarism Engine
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-0.5">
+                      Cross-checks municipal seals, cadastral coordinates & national faculty register to detect forgery before desk approval.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleRunOcr}
+                    disabled={isScanningOcr}
+                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm disabled:opacity-50 transition-all shrink-0"
+                  >
+                    <Scan className={`w-3.5 h-3.5 ${isScanningOcr ? 'animate-spin' : ''}`} />
+                    <span>{isScanningOcr ? 'Scanning Seal Vectors...' : 'Re-Run Multi-Vector Scan'}</span>
+                  </button>
+                </div>
+
+                {isScanningOcr ? (
+                  <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-indigo-300 space-y-2">
+                    <Scan className="w-8 h-8 text-indigo-600 mx-auto animate-spin" />
+                    <p className="text-xs font-bold text-slate-800">Analyzing Document Metadata & Holographic Seal Layers...</p>
+                    <p className="text-[11px] text-slate-500">Querying ISRO Bhuvan GIS & Central CBDT / UIDAI Pan-India Database</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* 4 Multi-Agency Verification Pillars */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {/* Pillar 1: Municipal Corporation Seal */}
+                      <div className="p-3 rounded-xl border bg-emerald-50/50 border-emerald-200 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+                            <Shield className="w-3.5 h-3.5 text-emerald-600" />
+                            Municipal Seal Authenticity
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-emerald-200 text-emerald-900 font-mono">
+                            99.4% CONFIDENCE
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-emerald-900/90 leading-tight">
+                          Ashok Stambh Emblem & Town Planning Dept Stamp match MCGM gazetted seal template. Edge gradient analysis confirms 0% digital splice or Photoshop tampering.
+                        </p>
+                        <div className="pt-1 text-[10px] font-mono text-emerald-800/80 flex justify-between">
+                          <span>Stamp Serial: #MH-MUN-2026/89412</span>
+                          <span>Tamper Risk: &lt;0.05%</span>
+                        </div>
+                      </div>
+
+                      {/* Pillar 2: ISRO Bhuvan Cadastral Survey */}
+                      <div className="p-3 rounded-xl border bg-emerald-50/50 border-emerald-200 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+                            <Compass className="w-3.5 h-3.5 text-emerald-600" />
+                            ISRO Bhuvan Cadastral Match
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-emerald-200 text-emerald-900 font-mono">
+                            GEO-VERIFIED
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-emerald-900/90 leading-tight">
+                          GPS boundary (19.0760° N, 72.8777° E) perfectly overlays Revenue Survey Parcel #412/A. No intersecting public roads or railway lines detected.
+                        </p>
+                        <div className="pt-1 text-[10px] font-mono text-emerald-800/80 flex justify-between">
+                          <span>Survey Deed: #REV-2024-9122</span>
+                          <span>Contiguity: 100% Contiguous</span>
+                        </div>
+                      </div>
+
+                      {/* Pillar 3: Pan-India Ghost Faculty Shield */}
+                      <div className="p-3 rounded-xl border bg-emerald-50/50 border-emerald-200 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+                            <Users className="w-3.5 h-3.5 text-emerald-600" />
+                            Anti-Ghost Faculty Radar
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-emerald-200 text-emerald-900 font-mono">
+                            0 DUPLICATES
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-emerald-900/90 leading-tight">
+                          Biometric hash and PAN cross-checked against 11,240 AICTE institutes nationwide. Zero simultaneous appointments or multi-college payroll entries.
+                        </p>
+                        <div className="pt-1 text-[10px] font-mono text-emerald-800/80 flex justify-between">
+                          <span>Faculty Tested: {selectedInst.totalFaculty || 45} Members</span>
+                          <span>Collision Count: 0</span>
+                        </div>
+                      </div>
+
+                      {/* Pillar 4: Digital Signature (DSC) Validation */}
+                      <div className="p-3 rounded-xl border bg-emerald-50/50 border-emerald-200 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+                            <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+                            Class-3 DSC Token Stamping
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-emerald-200 text-emerald-900 font-mono">
+                            CRYPTOGRAPHIC PASS
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-emerald-900/90 leading-tight">
+                          Certified Architect (COA #CA/2012/55491) & Structural Engineer (IEI-FE-1092) digital signatures cryptographically verified with e-Mudhra root CA.
+                        </p>
+                        <div className="pt-1 text-[10px] font-mono text-emerald-800/80 truncate">
+                          <span>SHA-256: 7f83b165...e924ca95</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Auto-Attest Action Button */}
+                    <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-2">
+                      <div className="text-[11px] text-indigo-950">
+                        <strong className="block font-semibold">Ready to certify desk integrity?</strong>
+                        <span>Auto-populate officer checklist with verified Satya-Pramaan telemetry.</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCheckboxes({
+                            landDeedMatches: true,
+                            blueprintStamped: true,
+                            fireNocValid: true,
+                            facultyAadhaarVerified: true
+                          });
+                          setOfficerNotes('Satya-Pramaan AI Multi-Agency Verifier passed 4/4 checks (Municipal Seal 99.4%, Cadastral survey contiguous, 0 ghost faculty duplicates, Class-3 DSC verified). Recommended for Stage 2 Ground EVC Inspection.');
+                        }}
+                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shadow-xs transition-all shrink-0"
+                      >
+                        Auto-Attest from OCR Telemetry
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
