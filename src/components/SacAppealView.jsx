@@ -57,33 +57,34 @@ export default function SacAppealView({
 
   return (
     <div className="space-y-5">
-      {/* Module Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-amber-950 to-slate-900 text-white p-5 rounded-2xl border border-slate-800 shadow-gov">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                Stage 3 Appellate Authority
-              </span>
-              <span className="text-slate-400 text-xs font-mono">
-                Quasi-Judicial Standing Appellate Committee (SAC/SHC)
-              </span>
+      {/* Module Compact Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-amber-950 to-slate-900 text-white p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-gov space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <Scale className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-              <Scale className="w-5 h-5 text-amber-400" />
-              SAC / SHC Standing Appellate Committee Workbench
-            </h2>
-            <p className="text-xs text-slate-300 max-w-3xl mt-1 leading-relaxed">
-              Quasi-Judicial appellate forum constituted under Chapter II of AICTE Approval Process Handbook to hear institutional grievances against Scrutiny/EVC deficiency rejections.
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold tracking-tight text-white font-sans">
+                  Stage 3: SAC / SHC Standing Appellate Bench
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Quasi-Judicial Forum
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Institutional Grievance Hearings against Scrutiny / EVC Deficiencies (APH Chapter II)
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-700">
-            <span className="text-xs text-slate-400">Select Appeal:</span>
+          <div className="flex items-center gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded-xl border border-slate-700">
+            <span className="text-[11px] text-slate-400 whitespace-nowrap">Appeal Case:</span>
             <select
               value={selectedInst?.id}
               onChange={(e) => setSelectedId(e.target.value)}
-              className="bg-slate-800 text-white text-xs font-medium rounded-lg px-2.5 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 max-w-xs"
+              className="bg-slate-800 text-white text-xs font-semibold rounded-lg px-2 py-1 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500 max-w-[220px] truncate"
             >
               {institutions.map(inst => (
                 <option key={inst.id} value={inst.id}>
@@ -94,27 +95,30 @@ export default function SacAppealView({
           </div>
         </div>
 
-        {/* Selected Banner */}
+        {/* Selected Institution Live Metric Strip */}
         {selectedInst && (
-          <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div>
-              <span className="text-slate-400 block text-[11px]">Appellant Institution</span>
-              <span className="font-bold text-white truncate block">{selectedInst.name}</span>
-              <span className="font-mono text-amber-300 text-[11px]">{selectedInst.permanentId}</span>
+          <div className="pt-3 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs items-center">
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Appellant Institution</span>
+              <span className="font-bold text-white text-xs truncate block">{selectedInst.name}</span>
+              <span className="font-mono text-amber-300 text-[11px] font-semibold">{selectedInst.permanentId}</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Appeal Filing Date</span>
-              <span className="font-medium text-slate-200">{appealData.filedDate}</span>
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Filing Date & Docket</span>
+              <span className="font-semibold text-slate-200 text-xs block">{appealData.filedDate}</span>
+              <span className="text-[11px] text-slate-400 block">Docket: SAC-2026-{selectedInst.permanentId ? selectedInst.permanentId.slice(-4) : '0000'}</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Bench Hearing Status</span>
-              <span className="font-semibold text-amber-300">{appealData.status}</span>
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Bench Hearing Status</span>
+              <span className="font-semibold text-amber-300 text-xs block">{appealData.status}</span>
+              <span className="text-[11px] text-slate-400 block">Hon'ble High Court Retd. Bench</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Appellate SLA Timer</span>
-              <span className="font-mono text-emerald-400 font-semibold">
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Appellate SLA Timer</span>
+              <span className="font-mono text-emerald-400 font-bold text-xs block">
                 {selectedInst.slaDaysRemaining !== undefined ? `${selectedInst.slaDaysRemaining} Days Left` : 'Active'}
               </span>
+              <span className="text-[11px] text-slate-400 block">Mandatory 10d Order Window</span>
             </div>
           </div>
         )}

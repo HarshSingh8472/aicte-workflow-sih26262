@@ -29,6 +29,7 @@ import {
 } from '../services/ruleEngine';
 import WorkflowPipeline from './WorkflowPipeline';
 import NirnayScoreCard from './NirnayScoreCard';
+import GisSatelliteMapView from './GisSatelliteMapView';
 
 export default function ScrutinyWorkbench({
   institutions = [],
@@ -82,69 +83,70 @@ export default function ScrutinyWorkbench({
 
   return (
     <div className="space-y-5">
-      {/* Module Header & Subtitle */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl border border-slate-800 shadow-gov">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Stage 1 Desk Verification
-              </span>
-              <span className="text-slate-400 text-xs font-mono">
-                Mandatory Pre-Inspection Scrutiny (APH Section 2.4)
-              </span>
+      {/* Module Compact Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-gov space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+              <FileCheck2 className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-              <FileCheck2 className="w-5 h-5 text-indigo-400" />
-              Scrutiny Committee Desk Workbench ("Paperwork vs. AICTE Rulebook")
-            </h2>
-            <p className="text-xs text-slate-300 max-w-3xl mt-1 leading-relaxed">
-              Stage 1 verifies official government-stamped certificates and architect blueprints at the desk BEFORE spending money to dispatch a physical inspection team.
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold tracking-tight text-white font-sans">
+                  Stage 1: Desk Scrutiny Committee Workbench
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  APH Clause 2.4
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Desk Verification: Stamped Floor Plans, Land Titles, Fire NOCs & 1:15 Faculty Roster
+              </p>
+            </div>
           </div>
 
           {/* College Selector Dropdown */}
-          <div className="flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-700">
-            <span className="text-xs text-slate-400 whitespace-nowrap">Select Institution:</span>
+          <div className="flex items-center gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded-xl border border-slate-700">
+            <span className="text-[11px] text-slate-400 whitespace-nowrap">Institution:</span>
             <select
               value={selectedInst?.id}
               onChange={(e) => setSelectedId(e.target.value)}
-              className="bg-slate-800 text-white text-xs font-medium rounded-lg px-2.5 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-xs"
+              className="bg-slate-800 text-white text-xs font-semibold rounded-lg px-2 py-1 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[220px] truncate"
             >
               {institutions.map(inst => (
                 <option key={inst.id} value={inst.id}>
-                  {inst.name} ({inst.region}) - {inst.status}
+                  {inst.name} ({inst.region})
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Selected Institution Banner */}
+        {/* Selected Institution Live Metric Strip */}
         {selectedInst && (
-          <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs items-center">
-            <div>
-              <span className="text-slate-400 block text-[11px]">Permanent AICTE ID</span>
-              <span className="font-mono font-bold text-amber-300">{selectedInst.permanentId}</span>
+          <div className="pt-3 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs items-center">
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Permanent AICTE ID</span>
+              <span className="font-mono font-bold text-amber-300 text-xs">{selectedInst.permanentId}</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Application Category</span>
-              <span className="font-medium text-slate-200 truncate block">{selectedInst.category}</span>
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Application Category</span>
+              <span className="font-semibold text-slate-200 text-xs truncate block">{selectedInst.category}</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Current Stage</span>
-              <span className="font-semibold text-indigo-300 capitalize">
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Current Stage</span>
+              <span className="font-semibold text-indigo-300 capitalize text-xs block">
                 {selectedInst.currentStage.replace('_', ' ')}
               </span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Scrutiny SLA Deadline</span>
-              <span className="font-mono text-emerald-400 font-semibold">
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Scrutiny SLA Timer</span>
+              <span className="font-mono text-emerald-400 font-bold text-xs">
                 {selectedInst.slaDaysRemaining !== undefined ? `${selectedInst.slaDaysRemaining} Days Left` : 'Active'}
               </span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px] mb-1">NIRNAY Compliance Score</span>
+            <div className="bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px] mb-1">NIRNAY Regulatory Index</span>
               <NirnayScoreCard institution={selectedInst} rules={aphRules} currentDate={currentDate} compact={true} />
             </div>
           </div>
@@ -308,6 +310,9 @@ export default function ScrutinyWorkbench({
                     Zoning: Permitted Technical Institution Campus. Free of all encumbrances.
                   </p>
                 </div>
+
+                {/* Spatial AI & ISRO Bhuvan Cadastral Survey Verification */}
+                <GisSatelliteMapView institution={selectedInst} />
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">

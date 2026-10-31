@@ -106,35 +106,36 @@ export default function CollegePortalView({
 
   return (
     <div className="space-y-6">
-      {/* College Portal Hero Bar */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-gov">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                Institutional Self-Service Portal
-              </span>
-              <span className="text-slate-400 text-xs font-mono">
-                AICTE Central Clearance Portal (SIH26262)
-              </span>
+      {/* College Portal Compact Context Bar */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-gov space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+              <Building2 className="w-5 h-5" />
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-blue-400" />
-              Technical Institution Administration & Application Dashboard
-            </h2>
-            <p className="text-xs text-slate-300 max-w-3xl mt-1 leading-relaxed">
-              Manage annual Extension of Approval (EoA), submit time-bound conditional undertakings, monitor statutory document validities, and track real-time SLA approval stages.
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold tracking-tight text-white font-sans">
+                  College Administration & EoA Portal
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  Institutional Self-Service
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                AICTE Approval Lifecycle, Undertakings Proofs & Statutory Compliance Monitoring
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             {/* College Perspective Switcher */}
-            <div className="flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-700">
-              <span className="text-xs text-slate-400">Switch College:</span>
+            <div className="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1.5 rounded-xl border border-slate-700">
+              <span className="text-[11px] text-slate-400 whitespace-nowrap">Institution:</span>
               <select
                 value={selectedInst?.id}
                 onChange={(e) => setSelectedInstId(e.target.value)}
-                className="bg-slate-800 text-white text-xs font-semibold rounded-lg px-2.5 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-xs"
+                className="bg-slate-800 text-white text-xs font-semibold rounded-lg px-2 py-1 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[200px] truncate"
               >
                 {institutions.map(inst => (
                   <option key={inst.id} value={inst.id}>
@@ -147,38 +148,38 @@ export default function CollegePortalView({
             {/* "+ Submit New AICTE Application" Wizard Button */}
             <button
               onClick={() => setWizardOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-600/30 transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-600/30 transition-all active:scale-95"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>+ Submit New AICTE Application</span>
+              <span>+ New Application</span>
             </button>
           </div>
         </div>
 
-        {/* Selected Institution Banner */}
+        {/* Selected Institution Live Metric Strip */}
         {selectedInst && (
-          <div className="mt-5 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-            <div>
-              <span className="text-slate-400 block text-[11px]">Institution & ID</span>
-              <span className="font-bold text-white text-sm truncate block">{selectedInst.name}</span>
-              <span className="font-mono text-amber-300 text-xs font-semibold">{selectedInst.permanentId}</span>
+          <div className="pt-3 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Institution & ID</span>
+              <span className="font-bold text-white text-xs truncate block">{selectedInst.name}</span>
+              <span className="font-mono text-amber-300 text-[11px] font-semibold">{selectedInst.permanentId}</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Region & Campus Type</span>
-              <span className="font-medium text-slate-200">{selectedInst.region} • {selectedInst.landType || 'Urban'}</span>
-              <span className="text-[11px] text-slate-400 block">{selectedInst.landAcres} Acres Continuous Land</span>
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Region & Campus Area</span>
+              <span className="font-semibold text-slate-200">{selectedInst.region} • {selectedInst.landType || 'Urban'}</span>
+              <span className="text-[11px] text-emerald-400 block font-medium">{selectedInst.landAcres} Acres Continuous Plot</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Faculty-Student Ratio</span>
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Faculty-Student Cadre</span>
               <span className={`font-mono font-bold text-xs ${selectedInst.facultyRatio <= aphRules.ugFacultyStudentRatio ? 'text-emerald-400' : 'text-rose-400'}`}>
-                1:{selectedInst.facultyRatio} (Req: 1:{aphRules.ugFacultyStudentRatio})
+                1:{selectedInst.facultyRatio} (Norm: 1:{aphRules.ugFacultyStudentRatio})
               </span>
               <span className="text-[11px] text-slate-400 block">{selectedInst.totalFaculty} Faculty / {selectedInst.totalStudents} Students</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Approval Status</span>
+            <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span className="text-slate-400 block text-[10px]">Regulatory Status</span>
               <span className="font-bold text-emerald-400 flex items-center gap-1">
-                {selectedInst.eoaIssued ? 'EoA Officially Issued' : selectedInst.status}
+                {selectedInst.eoaIssued ? 'EoA Officially Granted' : selectedInst.status}
               </span>
               <span className="text-[11px] text-slate-400 block">
                 {selectedInst.eoaIssued ? 'Academic Year 2026-2027' : `SLA: ${selectedInst.slaDaysRemaining}d remaining`}

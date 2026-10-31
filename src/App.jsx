@@ -14,6 +14,8 @@ import RuleConfigModal from './components/RuleConfigModal';
 import UndertakingsModal from './components/UndertakingsModal';
 import DocumentRenewModal from './components/DocumentRenewModal';
 import EoaCertificateModal from './components/EoaCertificateModal';
+import PublicVerifyPortal from './components/PublicVerifyPortal';
+import AicteMitraCopilot from './components/AicteMitraCopilot';
 import { 
   Building2, 
   FileCheck2, 
@@ -64,6 +66,11 @@ export default function App() {
 
   useEffect(() => {
     loadState();
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname === '/verify' || window.location.hash.includes('verify')) {
+        setActiveRole('verify');
+      }
+    }
   }, []);
 
   // Handlers
@@ -467,6 +474,15 @@ export default function App() {
             />
           </div>
         )}
+
+        {/* ROLE 6: Public Citizen & Student Verification Portal */}
+        {activeRole === 'verify' && (
+          <PublicVerifyPortal
+            institutions={data.institutions}
+            aphRules={data.aphRulesConfig}
+            currentDate={data.systemState.currentDate}
+          />
+        )}
       </main>
 
       {/* Global Modals & Drawers */}
@@ -516,6 +532,13 @@ export default function App() {
         isOpen={eoaModalOpen}
         onClose={() => setEoaModalOpen(false)}
         institution={eoaInst}
+      />
+
+      {/* Floating Regulatory AI Copilot (AICTE Mitra) */}
+      <AicteMitraCopilot
+        institutions={data.institutions}
+        aphRules={data.aphRulesConfig}
+        currentDate={data.systemState.currentDate}
       />
 
       {/* Government Footer */}
