@@ -196,6 +196,24 @@ export function calculateNirnayIndex(institution, rules, currentDateStr) {
   if (land.pass) spaceScore += 12;
   else spaceScore += Math.max(0, 12 - (land.deficit || 1) * 8);
 
+  // Ground EVC Inspection physical audit telemetry
+  if (institution.evcInspection) {
+    const claimedF = Number(institution.evcInspection.claimedFloors || 0);
+    const actualF = Number(institution.evcInspection.actualFloors !== undefined ? institution.evcInspection.actualFloors : claimedF);
+    if (claimedF > 0 && actualF < claimedF) {
+      // Unfinished upper floors / construction shortfall (-16 pts per missing floor)
+      spaceScore = Math.max(0, spaceScore - (claimedF - actualF) * 16);
+    }
+
+    const claimedP = Number(institution.evcInspection.claimedPcs || 0);
+    const actualP = Number(institution.evcInspection.actualPcs !== undefined ? institution.evcInspection.actualPcs : claimedP);
+    if (claimedP > 0 && actualP < claimedP) {
+      // Hardware PC terminal shortfall (-1 pt per 10 missing PCs)
+      const pcDeficit = claimedP - actualP;
+      spaceScore = Math.max(0, spaceScore - Math.min(10, Math.round(pcDeficit / 10)));
+    }
+  }
+
   let humanCapitalScore = 0;
   if (faculty.pass) humanCapitalScore += 20;
   else humanCapitalScore += Math.max(0, 20 - (faculty.calculatedRatio - faculty.maxAllowedRatio) * 4);
@@ -231,10 +249,10 @@ export function calculateNirnayIndex(institution, rules, currentDateStr) {
     bandTone = 'rose';
     entitlement = 'Critical Non-Compliance: Admissions Halted pending Comprehensive Hearing';
   } else if (totalScore < 75) {
-    band = 'Band 3 (Conditional Supervision)';
-    bandGrade = 'C';
+    band = 'Band 3 (Conditional Supervision - Action Required)';
+    bandGrade = 'B-';
     bandTone = 'amber';
-    entitlement = 'Mandatory Physical EVC Spot-Check & Biometric Inspection';
+    entitlement = 'Mandatory Physical EVC Rectification & Biometric Inspection';
   } else if (totalScore < 90) {
     band = 'Band 2 (Standard Regulatory Cadence)';
     bandGrade = 'B+';

@@ -193,7 +193,7 @@ export default function TopCommandHeader({
           <button
             onClick={onOpenAlerts}
             className="relative p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
-            title="Open 3-Tier Alert & Auto-Escalation Sentinel"
+            title="Open 3-Tier Alert Sentinel (4 Active Alerts across Tiers 1-3)"
           >
             <Bell className={`w-3.5 h-3.5 ${tier3AlertCount > 0 ? 'text-rose-400 animate-bounce' : 'text-amber-400'}`} />
             {unreadAlertCount > 0 && (

@@ -338,7 +338,7 @@ export default function App() {
     );
   }
 
-  const unreadAlerts = data.alerts.filter(a => !a.read).length;
+  const unreadAlerts = data.alerts.length; // 4 active alerts matching drawer tabs
   const tier3Alerts = data.alerts.filter(a => a.tier === 3).length;
 
   return (

@@ -336,7 +336,7 @@ export default function EvcWorkbench({
             </div>
             <div className="bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
               <span className="text-slate-400 block text-[10px] mb-1">NIRNAY Compliance Index</span>
-              <NirnayScoreCard institution={selectedInst} rules={rules} currentDate={currentDate} compact={true} />
+              <NirnayScoreCard institution={liveEvcInst} rules={rules} currentDate={currentDate} compact={true} />
             </div>
           </div>
         )}

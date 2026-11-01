@@ -179,7 +179,7 @@ export default function RuleConfigModal({
             <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px] block">
               3. SLA Deadlines & Expiry Alert Window:
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
                   Scrutiny SLA (Days):
@@ -197,7 +197,7 @@ export default function RuleConfigModal({
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  EVC Schedule SLA (Days):
+                  EVC Schedule SLA:
                 </label>
                 <input
                   type="number"
@@ -212,7 +212,22 @@ export default function RuleConfigModal({
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Advance Expiry Alert (Days):
+                  EVC Complete SLA:
+                </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="30"
+                  value={formData.evcCompleteSlaDays || 15}
+                  onChange={(e) => handleChange('evcCompleteSlaDays', e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                />
+                <span className="text-[10px] text-slate-500">Default: 15 Days</span>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Expiry Alert (Days):
                 </label>
                 <input
                   type="number"
