@@ -130,14 +130,7 @@ export default function SacAppealView({
       {/* Progress Pipeline */}
       {selectedInst && <WorkflowPipeline institution={selectedInst} />}
 
-      {/* Clause F — Statutory Human-in-the-Loop Disclaimer */}
-      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-start gap-2 text-[11px] text-amber-900">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <strong className="text-xs text-amber-950">APH Clause F — Quasi-Judicial Forum:</strong>{' '}
-          All appellate bench orders constitute <strong>statutory decisions by the competent judicial authority</strong>. Digital signature and bench seal are mandatory before order enforcement.
-        </div>
-      </div>
+      
 
       {/* Grid: Grounds for Appeal vs Appellate Bench Judgment */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -244,7 +237,11 @@ export default function SacAppealView({
 
           {/* Bench Actions */}
           <div className="pt-4 border-t border-slate-200 space-y-2">
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex items-center gap-1.5 text-[11px] text-amber-800 bg-amber-50/80 px-2.5 py-1 rounded-lg border border-amber-200/80 mb-2 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>Quasi-Judicial Mandate (Clause F): Hon'ble Bench e-Sign OTP required for legally binding order.</span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => { setPendingAction('grant'); setESignOpen(true); }}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all"

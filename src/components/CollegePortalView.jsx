@@ -199,6 +199,22 @@ export default function CollegePortalView({
         />
       )}
 
+      {/* Real-Time Application Progress Pipeline */}
+      {selectedInst && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs px-1">
+            <span className="font-bold text-slate-800">Active AICTE Workflow Pipeline & SLA Tracker:</span>
+            <button
+              onClick={() => onViewAudit(selectedInst)}
+              className="text-blue-600 hover:underline font-medium"
+            >
+              View Cryptographic SHA-256 Audit Trail
+            </button>
+          </div>
+          <WorkflowPipeline institution={selectedInst} />
+        </div>
+      )}
+
       {/* ACTION BANNER: RECTIFY DEFICIENCY & RE-SUBMIT (Spot-Stealer #5) */}
       {selectedInst && (selectedInst.currentStage === 'escalated_deficiency' || selectedInst.currentStage === 'sac_appeal') && (
         <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-200 shadow-xs space-y-3">
@@ -243,22 +259,6 @@ export default function CollegePortalView({
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Real-Time Application Progress Pipeline */}
-      {selectedInst && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs px-1">
-            <span className="font-bold text-slate-800">Active AICTE Workflow Pipeline & SLA Tracker:</span>
-            <button
-              onClick={() => onViewAudit(selectedInst)}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              View Cryptographic SHA-256 Audit Trail
-            </button>
-          </div>
-          <WorkflowPipeline institution={selectedInst} />
         </div>
       )}
 

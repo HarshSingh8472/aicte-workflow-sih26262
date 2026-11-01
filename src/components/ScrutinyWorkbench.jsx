@@ -160,14 +160,7 @@ export default function ScrutinyWorkbench({
       {/* Progress Pipeline */}
       {selectedInst && <WorkflowPipeline institution={selectedInst} />}
 
-      {/* Clause F — Statutory Human-in-the-Loop Disclaimer */}
-      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-start gap-2 text-[11px] text-amber-900">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <strong className="text-xs text-amber-950">APH Clause F — Statutory Human-in-the-Loop Guardrail:</strong>{' '}
-          Automated alerts, recommendations and workflow actions support but <strong>do not replace</strong> statutory scrutiny, verification, inspections or decisions by the competent authority. All stage transitions require e-Sign OTP confirmation.
-        </div>
-      </div>
+      
 
       {/* Split-Screen Workbench */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -731,7 +724,11 @@ export default function ScrutinyWorkbench({
 
           {/* Action Buttons */}
           <div className="pt-4 border-t border-slate-200 space-y-2 mt-4">
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex items-center gap-1.5 text-[11px] text-amber-800 bg-amber-50/80 px-2.5 py-1 rounded-lg border border-amber-200/80 mb-2 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>Statutory Guardrail (APH Clause F): AI recommendations require Competent Authority e-Sign OTP confirmation.</span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => { setPendingAction('approve'); setESignOpen(true); }}
                 disabled={!isCurrentInScrutiny && selectedInst.currentStage !== 'escalated_deficiency'}

@@ -345,14 +345,7 @@ export default function EvcWorkbench({
       {/* Progress Pipeline */}
       {selectedInst && <WorkflowPipeline institution={selectedInst} />}
 
-      {/* Clause F — Statutory Human-in-the-Loop Disclaimer */}
-      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-start gap-2 text-[11px] text-amber-900">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <strong className="text-xs text-amber-950">APH Clause F — Statutory Human-in-the-Loop Guardrail:</strong>{' '}
-          Ground verification results are <strong>automated recommendations</strong>. All EVC clearances, conditional undertakings and rejections require competent authority e-Sign OTP statutory sign-off.
-        </div>
-      </div>
+      
 
       {/* TAB A: EVC QUEUE & SLA SCHEDULER */}
       {activeTab === 'queue' && (
@@ -883,6 +876,10 @@ export default function EvcWorkbench({
 
             {/* Action Buttons */}
             <div className="pt-3 border-t border-slate-200 space-y-2">
+              <div className="flex items-center gap-1.5 text-[11px] text-amber-800 bg-amber-50/80 px-2.5 py-1 rounded-lg border border-amber-200/80 mb-2 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>Statutory Guardrail (APH Clause F): Panelist e-Sign OTP required for all ground findings.</span>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {/* 1. Clear EVC */}
                 <button
