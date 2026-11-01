@@ -7,7 +7,7 @@ import { Clock, AlertTriangle, Flame } from 'lucide-react';
  * Bands: 0–7 Days [Green], 8–15 Days [Amber], 16–30 Days [Orange], >30 Days [Red]
  */
 export default function AgeingHeatmap({ institutions = [], currentDate }) {
-  const today = new Date(currentDate);
+  const today = currentDate ? new Date(currentDate) : new Date();
 
   const regions = ['WRO', 'SRO', 'ERO', 'NRO'];
   const stages = ['scrutiny_queue', 'evc_queue', 'sac_appeal', 'ro_approval'];
@@ -18,9 +18,13 @@ export default function AgeingHeatmap({ institutions = [], currentDate }) {
     ro_approval: 'RO Final Sign-Off'
   };
 
-  const getAgeDays = (inst) => {
-    const submitted = new Date(inst.stageUpdatedDate || inst.submittedDate || currentDate);
-    return Math.max(0, Math.floor((today - submitted) / (1000 * 60 * 60 * 24)));
+    const getAgeDays = (inst) => {
+    if (!inst) return 0;
+    const dateStr = inst.stageUpdatedDate || inst.submittedDate || currentDate;
+    if (!dateStr) return 0;
+    const submitted = new Date(dateStr);
+    const diff = Math.floor((today - submitted) / (1000 * 60 * 60 * 24));
+    return isNaN(diff) || diff < 0 ? 0 : diff;
   };
 
   const getAgeColor = (days) => {

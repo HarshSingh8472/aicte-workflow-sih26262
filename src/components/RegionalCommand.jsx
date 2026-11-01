@@ -39,6 +39,7 @@ export default function RegionalCommand({
   onSelectInstitution
 }) {
   const [viewMode, setViewMode] = useState('executive'); // 'executive' | 'operational'
+  const [matrixView, setMatrixView] = useState('pendency'); // 'pendency' | 'ageing'
   const [selectedRegion, setSelectedRegion] = useState('ALL');
   const [selectedStage, setSelectedStage] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
