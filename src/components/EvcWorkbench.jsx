@@ -227,6 +227,20 @@ export default function EvcWorkbench({
 
   const pcShortage = Math.max(0, claimedPcs - actualPcs);
 
+  // Live telemetry institution for dynamic NIRNAY score recalculation
+  const liveEvcInst = {
+    ...selectedInst,
+    totalFaculty: actualFaculty,
+    evcInspection: {
+      ...selectedInst?.evcInspection,
+      claimedFloors,
+      claimedPcs,
+      actualFloors,
+      actualPcs,
+      actualFacultyPresent: actualFaculty
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Module Compact Header */}
