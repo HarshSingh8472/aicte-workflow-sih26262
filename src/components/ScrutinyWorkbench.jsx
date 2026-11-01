@@ -30,6 +30,8 @@ import {
 import WorkflowPipeline from './WorkflowPipeline';
 import NirnayScoreCard from './NirnayScoreCard';
 import GisSatelliteMapView from './GisSatelliteMapView';
+import ESignConfirmModal from './ESignConfirmModal';
+import { ApiIntegrationStrip } from './ApiIntegrationPills';
 
 export default function ScrutinyWorkbench({
   institutions = [],
@@ -52,6 +54,8 @@ export default function ScrutinyWorkbench({
   const [isScanningOcr, setIsScanningOcr] = useState(false);
   const [ocrDone, setOcrDone] = useState(true);
   const [officerNotes, setOfficerNotes] = useState('');
+  const [eSignOpen, setESignOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
   const [checkboxes, setCheckboxes] = useState({
     landDeedMatches: true,
     blueprintStamped: true,
@@ -155,6 +159,15 @@ export default function ScrutinyWorkbench({
 
       {/* Progress Pipeline */}
       {selectedInst && <WorkflowPipeline institution={selectedInst} />}
+
+      {/* Clause F — Statutory Human-in-the-Loop Disclaimer */}
+      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-start gap-2 text-[11px] text-amber-900">
+        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div>
+          <strong className="text-xs text-amber-950">APH Clause F — Statutory Human-in-the-Loop Guardrail:</strong>{' '}
+          Automated alerts, recommendations and workflow actions support but <strong>do not replace</strong> statutory scrutiny, verification, inspections or decisions by the competent authority. All stage transitions require e-Sign OTP confirmation.
+        </div>
+      </div>
 
       {/* Split-Screen Workbench */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -301,6 +314,8 @@ export default function ScrutinyWorkbench({
                       <MapPin className="w-4 h-4 text-emerald-600" />
                       Government Tehsildar & Sub-Registrar Title Certificate
                     </span>
+                    <ApiIntegrationStrip types={['land', 'digilocker']} className="mt-1" />
+                    
                     <span className="px-2 py-0.5 rounded bg-emerald-200/80 text-emerald-800 text-[10px] font-bold">
                       VERIFIED DEED
                     </span>
@@ -334,7 +349,8 @@ export default function ScrutinyWorkbench({
             {/* TAB 3: STATUTORY SAFETY & BANK FDR */}
             {activeTab === 'safety' && (
               <div className="space-y-3">
-                <div className="text-xs font-semibold text-slate-700">Government Mandatory Clearance Certificates:</div>
+                <div className="text-xs font-semibold text-slate-700">Government Mandatory Clearance Certificates:
+                <ApiIntegrationStrip types={['fire', 'digilocker', 'pfms']} className="mt-1" /></div>
                 <div className="space-y-2.5">
                   {(selectedInst.documents || []).map((doc, idx) => (
                     <div 
@@ -385,7 +401,10 @@ export default function ScrutinyWorkbench({
                 <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200 text-blue-950 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-blue-600" />
-                    <span className="font-semibold">AICTE Approved Faculty Portal Roster</span>
+                    <span className="font-semibold">AICTE Approved Faculty Portal Roster
+                  </span>
+                  <ApiIntegrationStrip types={['faculty']} className="mt-0.5" />
+                  
                   </div>
                   <span className="text-[11px] font-mono text-blue-800">
                     Aadhaar / PAN Bio-Seeded
@@ -714,17 +733,17 @@ export default function ScrutinyWorkbench({
           <div className="pt-4 border-t border-slate-200 space-y-2 mt-4">
             <div className="flex flex-col sm:flex-row gap-2">
               <button
-                onClick={() => onApproveScrutiny(selectedInst, officerNotes)}
+                onClick={() => { setPendingAction('approve'); setESignOpen(true); }}
                 disabled={!isCurrentInScrutiny && selectedInst.currentStage !== 'escalated_deficiency'}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 title="Approve desk scrutiny and auto-route to Stage 2 EVC Queue"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Approve Stage 1 &rarr; Auto-Route to Stage 2 EVC Queue</span>
+                <span>AI Recommendation: APPROVE — Statutory Sign-Off Required</span>
               </button>
 
               <button
-                onClick={() => onRaiseDeficiency(selectedInst, officerNotes)}
+                onClick={() => { setPendingAction('deficiency'); setESignOpen(true); }}
                 className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors"
                 title="Flag deficiency and notify institution for appeal or rectification"
               >
@@ -746,6 +765,19 @@ export default function ScrutinyWorkbench({
         </div>
 
       </div>
+      {/* Statutory e-Sign OTP Confirmation Modal */}
+      <ESignConfirmModal
+        isOpen={eSignOpen}
+        onClose={() => setESignOpen(false)}
+        onConfirm={() => {
+          if (pendingAction === 'approve') onApproveScrutiny(selectedInst, officerNotes);
+          if (pendingAction === 'deficiency') onRaiseDeficiency(selectedInst, officerNotes);
+          setPendingAction(null);
+        }}
+        actionLabel={pendingAction === 'approve' ? 'Approve Stage 1 Desk Scrutiny' : 'Raise Deficiency & Route to SAC'}
+        officerName="Dr. R. K. Shinde (WRO Scrutiny Committee)"
+        institution={selectedInst}
+      />
     </div>
   );
 }

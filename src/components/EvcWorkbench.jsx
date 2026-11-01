@@ -30,6 +30,8 @@ import {
 import WorkflowPipeline from './WorkflowPipeline';
 import NirnayScoreCard from './NirnayScoreCard';
 import GisSatelliteMapView from './GisSatelliteMapView';
+import ESignConfirmModal from './ESignConfirmModal';
+import { ApiIntegrationStrip } from './ApiIntegrationPills';
 
 export default function EvcWorkbench({
   institutions = [],
@@ -189,6 +191,8 @@ export default function EvcWorkbench({
   );
   const [gstInvoiceChecked, setGstInvoiceChecked] = useState(true);
   const [inspectorRemarks, setInspectorRemarks] = useState('');
+  const [eSignOpen, setESignOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const checkpoints = [
     {
@@ -341,6 +345,15 @@ export default function EvcWorkbench({
       {/* Progress Pipeline */}
       {selectedInst && <WorkflowPipeline institution={selectedInst} />}
 
+      {/* Clause F — Statutory Human-in-the-Loop Disclaimer */}
+      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-start gap-2 text-[11px] text-amber-900">
+        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div>
+          <strong className="text-xs text-amber-950">APH Clause F — Statutory Human-in-the-Loop Guardrail:</strong>{' '}
+          Ground verification results are <strong>automated recommendations</strong>. All EVC clearances, conditional undertakings and rejections require competent authority e-Sign OTP statutory sign-off.
+        </div>
+      </div>
+
       {/* TAB A: EVC QUEUE & SLA SCHEDULER */}
       {activeTab === 'queue' && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -415,6 +428,12 @@ export default function EvcWorkbench({
                 <h3 className="text-base font-bold text-white">
                   Suraksha-Chakra Anti-Bias Algorithmic Inspector Allocation
                 </h3>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Out-of-State Expert Verified</span>
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ No Past Institution Conflict</span>
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Domain Match: Engineering</span>
+                </div>
+                
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
                   APH 2026-27 Clause 4.2
                 </span>
@@ -867,17 +886,17 @@ export default function EvcWorkbench({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {/* 1. Clear EVC */}
                 <button
-                  onClick={() => onClearEvc(selectedInst, { actualPcs, actualFloors, actualFaculty, remarks: inspectorRemarks })}
+                  onClick={() => { setPendingAction('clear'); setESignOpen(true); }}
                   className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all"
                   title="Forward directly to Regional Officer for final EoA sign-off"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Clear EVC</span>
+                  <span>Recommend: Clear EVC</span>
                 </button>
 
                 {/* 2. Grant Conditional Undertaking */}
                 <button
-                  onClick={() => onOpenUndertakingModal(selectedInst, pcShortage, inspectorRemarks)}
+                  onClick={() => { setPendingAction('undertaking'); setESignOpen(true); }}
                   className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold text-amber-950 bg-amber-400 hover:bg-amber-500 shadow-md shadow-amber-400/20 transition-all"
                   title="Grant conditional recommendation requiring college to fulfill shortfalls within strict deadline"
                 >
@@ -887,12 +906,12 @@ export default function EvcWorkbench({
 
                 {/* 3. Reject / Route SAC */}
                 <button
-                  onClick={() => onRejectEvc(selectedInst, inspectorRemarks)}
+                  onClick={() => { setPendingAction('reject'); setESignOpen(true); }}
                   className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20 transition-all"
                   title="Reject and route to Standing Appellate Committee (SAC) queue"
                 >
                   <XCircle className="w-4 h-4" />
-                  <span>Reject & Appeal</span>
+                  <span>Recommend: Reject</span>
                 </button>
               </div>
 
@@ -910,6 +929,20 @@ export default function EvcWorkbench({
 
         </div>
       )}
+      {/* Statutory e-Sign OTP Confirmation Modal */}
+      <ESignConfirmModal
+        isOpen={eSignOpen}
+        onClose={() => setESignOpen(false)}
+        onConfirm={() => {
+          if (pendingAction === 'clear') onClearEvc(selectedInst, { actualPcs, actualFloors, actualFaculty, remarks: inspectorRemarks });
+          if (pendingAction === 'undertaking') onOpenUndertakingModal(selectedInst, pcShortage, inspectorRemarks);
+          if (pendingAction === 'reject') onRejectEvc(selectedInst, inspectorRemarks);
+          setPendingAction(null);
+        }}
+        actionLabel={pendingAction === 'clear' ? 'Clear EVC Ground Inspection' : pendingAction === 'undertaking' ? 'Grant Conditional Undertaking' : 'Reject & Route to SAC Appeal'}
+        officerName="National EVC Inspection Panelist"
+        institution={selectedInst}
+      />
     </div>
   );
 }

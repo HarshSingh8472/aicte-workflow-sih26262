@@ -29,6 +29,7 @@ export default function CollegePortalView({
   onOpenUndertakingProofModal,
   onOpenDocumentRenewModal,
   onViewAudit,
+  onRectifyDeficiency,
   onViewEoa
 }) {
   const [selectedInstId, setSelectedInstId] = useState(institutions[0]?.id);
@@ -198,6 +199,53 @@ export default function CollegePortalView({
         />
       )}
 
+      {/* ACTION BANNER: RECTIFY DEFICIENCY & RE-SUBMIT (Spot-Stealer #5) */}
+      {selectedInst && (selectedInst.currentStage === 'escalated_deficiency' || selectedInst.currentStage === 'sac_appeal') && (
+        <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-200 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 bg-indigo-600 text-white rounded-lg">
+                <FileCheck2 className="w-4 h-4" />
+              </span>
+              <div>
+                <h4 className="text-sm font-bold text-indigo-950">
+                  Deficiency Observation — Return for Rectification Window Open
+                </h4>
+                <p className="text-xs text-indigo-800">
+                  AICTE allows institutions to rectify identified deficiencies and re-submit corrected documents before final SAC/SHC hearing
+                </p>
+              </div>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-200 text-indigo-900 border border-indigo-300">
+              Rectification Window
+            </span>
+          </div>
+
+          <div className="bg-white p-3.5 rounded-xl border border-indigo-200/80 text-xs text-slate-700 space-y-2">
+            <div className="font-semibold text-slate-900">Identified deficiencies can be rectified by uploading corrected documents:</div>
+            <ul className="list-disc list-inside text-slate-600 space-y-1 text-[11px]">
+              <li>Corrected architect blueprints with Municipal Corporation re-stamp</li>
+              <li>Updated faculty roster with new appointment letters</li>
+              <li>GST invoice proofs for additional hardware procurement</li>
+              <li>Renewed statutory NOC certificates</li>
+            </ul>
+            
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+              <span className="text-[11px] text-slate-500">
+                Status: <strong className="text-indigo-800">{selectedInst.currentStage === 'escalated_deficiency' ? 'Deficiency Confirmed — Rectification Allowed' : 'Under SAC Review — Rectification Allowed'}</strong>
+              </span>
+              <button
+                onClick={() => onRectifyDeficiency && onRectifyDeficiency(selectedInst)}
+                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center gap-1.5 transition-all"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Rectify Deficiency & Re-Submit to Scrutiny</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Real-Time Application Progress Pipeline */}
       {selectedInst && (
         <div className="space-y-2">
@@ -332,7 +380,12 @@ export default function CollegePortalView({
                 <FileCheck2 className="w-4 h-4 text-blue-600" />
                 Statutory Government Approvals & Certificates Repository
               </h3>
-              <p className="text-xs text-slate-500">Land lease, Fire safety NOC, structural stability, and joint FDRs</p>
+              <p className="text-xs text-slate-500">Land lease, Fire safety NOC, structural stability, and joint FDRs
+              <div className="flex flex-wrap gap-1 mt-1">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-800 border border-blue-200">🔐 DigiLocker API</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">🏦 PFMS Bank API</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-orange-50 text-orange-800 border border-orange-200">🔥 Fire NOC Registry</span>
+              </div></p>
             </div>
           </div>
 

@@ -288,6 +288,20 @@ export default function App() {
     }
   };
 
+  const handleRectifyDeficiency = async (inst) => {
+    const updated = await aicteApi.transitionStage(inst.id, 'scrutiny_queue', {
+      role: 'College Administration',
+      user: inst.name + ' Management',
+      remarks: 'Deficiency rectified with corrected documents. Re-submitted to Scrutiny Desk for fresh review.',
+    });
+    setData(updated);
+    showToast(
+      'Deficiency Rectified & Re-Submitted',
+      `${inst.name} has re-submitted corrected documents. Application returned to Stage 1 Scrutiny Queue for fresh evaluation.`,
+      'indigo'
+    );
+  };
+
   const handleExportData = (format) => {
     if (!data) return;
     const blob = new Blob(
@@ -382,6 +396,7 @@ export default function App() {
               setAuditInst(inst);
               setAuditModalOpen(true);
             }}
+            onRectifyDeficiency={handleRectifyDeficiency}
             onViewEoa={(inst) => {
               setEoaInst(inst);
               setEoaModalOpen(true);

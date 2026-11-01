@@ -21,6 +21,7 @@ import {
   Layers
 } from 'lucide-react';
 import PendencyMatrix from './PendencyMatrix';
+import AgeingHeatmap from './AgeingHeatmap';
 import NirnayScoreCard from './NirnayScoreCard';
 import NationalExecutiveDashboard from './NationalExecutiveDashboard';
 import { calculateNirnayIndex } from '../services/ruleEngine';
@@ -231,6 +232,9 @@ export default function RegionalCommand({
         selectedStage={selectedStage}
         onCellSelect={handleCellSelect}
       />
+
+      {/* Application Ageing Matrix & Pendency Heatmap — Spot-Stealer #2 */}
+      <AgeingHeatmap institutions={institutions} currentDate={currentDate} />
 
       {/* Filter & Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">

@@ -15,6 +15,7 @@ import {
   UploadCloud
 } from 'lucide-react';
 import WorkflowPipeline from './WorkflowPipeline';
+import ESignConfirmModal from './ESignConfirmModal';
 
 export default function SacAppealView({
   institutions = [],
@@ -34,6 +35,8 @@ export default function SacAppealView({
   const selectedInst = institutions.find(i => i.id === selectedId) || institutions[0];
 
   const [benchVerdict, setBenchVerdict] = useState('');
+  const [eSignOpen, setESignOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
   const [benchMembers] = useState([
     "Hon'ble Justice (Retd.) P. N. Verma (Former Judge, High Court)",
     "Prof. (Dr.) S. C. Sahasrabudhe (Former Director, IIT / AICTE Senior Fellow)",
@@ -126,6 +129,15 @@ export default function SacAppealView({
 
       {/* Progress Pipeline */}
       {selectedInst && <WorkflowPipeline institution={selectedInst} />}
+
+      {/* Clause F — Statutory Human-in-the-Loop Disclaimer */}
+      <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-start gap-2 text-[11px] text-amber-900">
+        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div>
+          <strong className="text-xs text-amber-950">APH Clause F — Quasi-Judicial Forum:</strong>{' '}
+          All appellate bench orders constitute <strong>statutory decisions by the competent judicial authority</strong>. Digital signature and bench seal are mandatory before order enforcement.
+        </div>
+      </div>
 
       {/* Grid: Grounds for Appeal vs Appellate Bench Judgment */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -234,21 +246,21 @@ export default function SacAppealView({
           <div className="pt-4 border-t border-slate-200 space-y-2">
             <div className="flex flex-col sm:flex-row gap-2">
               <button
-                onClick={() => onGrantAppeal(selectedInst, benchVerdict)}
+                onClick={() => { setPendingAction('grant'); setESignOpen(true); }}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all"
                 title="Grant appeal, overturn deficiency rejection, and route to Regional Officer for final EoA"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Grant Appeal &rarr; Route to Regional Officer for EoA</span>
+                <span>Bench Recommendation: Grant Appeal — e-Sign Required</span>
               </button>
 
               <button
-                onClick={() => onDismissAppeal(selectedInst, benchVerdict)}
+                onClick={() => { setPendingAction('dismiss'); setESignOpen(true); }}
                 className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20 transition-all"
                 title="Dismiss appeal and confirm rejection of approval for academic year 2026-27"
               >
                 <XCircle className="w-4 h-4" />
-                <span>Dismiss Appeal</span>
+                <span>Bench Order: Dismiss — e-Sign Required</span>
               </button>
             </div>
 
@@ -265,6 +277,19 @@ export default function SacAppealView({
         </div>
 
       </div>
+      {/* Statutory e-Sign OTP Confirmation Modal */}
+      <ESignConfirmModal
+        isOpen={eSignOpen}
+        onClose={() => setESignOpen(false)}
+        onConfirm={() => {
+          if (pendingAction === 'grant') onGrantAppeal(selectedInst, benchVerdict);
+          if (pendingAction === 'dismiss') onDismissAppeal(selectedInst, benchVerdict);
+          setPendingAction(null);
+        }}
+        actionLabel={pendingAction === 'grant' ? 'Grant Appeal — Issue Formal Bench Order' : 'Dismiss Appeal — Confirm Rejection Order'}
+        officerName="Hon'ble SAC Appellate Bench (Retd. High Court Justice)"
+        institution={selectedInst}
+      />
     </div>
   );
 }
